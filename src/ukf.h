@@ -95,6 +95,18 @@ class UKF {
 
   // Sigma point spreading parameter
   double lambda_;
+
+  // measurement noise covariance matrix for radar
+  Eigen::MatrixXd R_radar_;
+
+  // measurement noise covariance matrix for lidar
+  Eigen::MatrixXd R_lidar_;
+
+  // NIS for radar
+  double NIS_radar_;
+
+  // NIS for lidar
+  double NIS_lidar_;
 };
 
 #endif  // UKF_H
