@@ -147,7 +147,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     UpdateRadar(meas_package);
   }
 
-  // Update step for Radar
+  // Update step for Lidar
   if(meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_)
   {
     UpdateLidar(meas_package);
@@ -230,7 +230,7 @@ void UKF::Prediction(double delta_t) {
     yaw_p = yaw_p + (0.5 * nu_yawd * delta_t * delta_t);
     yawd_p = yawd_p + (nu_yawd * delta_t);
 
-    // write predicted sigma point into right column
+    // predict sigma point into right column
     Xsig_pred_(0, i) = px_p;
     Xsig_pred_(1, i) = py_p;
     Xsig_pred_(2, i) = v_p;
@@ -240,6 +240,7 @@ void UKF::Prediction(double delta_t) {
 
   // predicted state mean
   x_.fill(0.0);
+
   // iterate over sigma points
   for(int i = 0; i < (2 * n_aug_ + 1); i++)
   {
@@ -248,6 +249,7 @@ void UKF::Prediction(double delta_t) {
 
   // predicted state covariance matrix
   P_.fill(0.0);
+
   // iterate over sigma points
   for(int i = 0; i < (2 * n_aug_ + 1); i++)
   {
@@ -265,6 +267,7 @@ void UKF::Prediction(double delta_t) {
       x_diff(3) += 2.*M_PI;
     }
 
+    // update state covariance matrix
     P_ = P_ + weights_(i)*x_diff*x_diff.transpose();
   }
 }
@@ -318,6 +321,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
       z_diff(1) += 2.*M_PI;
     }
 
+    // update predicted measurement covariance matrix
     S = S + weights_(i) * z_diff * z_diff.transpose();
   }
 
@@ -330,6 +334,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
   // calculate cross correlation matrix
   Tc.fill(0.0);
+
   for(int i = 0; i < (2 * n_aug_ + 1); i++)
   {
     // residual
@@ -358,6 +363,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
       x_diff(3) += 2.*M_PI;
     }
 
+    // update cross correlation matrix
     Tc = Tc + (weights_(i) * x_diff * z_diff.transpose());
   }
 
@@ -447,6 +453,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
       z_diff(1) += 2.*M_PI;
     }
 
+    // update predicted measurement covariance matrix
     S = S + (weights_(i) * z_diff * z_diff.transpose());
   }
 
@@ -459,6 +466,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 
   // calculate cross correlation matrix
   Tc.fill(0.0);
+
   for(int i = 0; i < (2 * n_aug_ + 1); i++)  // 2n+1 simga points
   {
     // residual
@@ -489,6 +497,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
       x_diff(3) += 2.*M_PI;
     }
 
+    // update cross correlation matrix
     Tc = Tc + (weights_(i) * x_diff * z_diff.transpose());
   }
 
